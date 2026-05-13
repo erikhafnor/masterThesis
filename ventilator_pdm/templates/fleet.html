@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Fleet Overview — PdM Service{% endblock %}
+
+{% block page_title %}Fleet Overview{% endblock %}
+
+{% block content %}
+<div class="card card-wide">
+    <div class="card-header">Fleet Overview</div>
+    <div class="card-body">
+        {% if devices %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Reg.nr.</th>
+                    <th>Serial</th>
+                    <th>Status</th>
+                    <th>Fleet Percentile</th>
+                    <th>Last Scored</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in devices %}
+                <tr>
+                    <td>
+                        <a href="/device/{{ d.device_serial }}" class="device-link">
+                            {{ d.device_serial }}
+                        </a>
+                    </td>
+                    <td>{{ d.device_serial }}</td>
+                    <td>
+                        {% if d.fleet_percentile is not none %}
+                            {% if d.fleet_percentile >= 99 %}
+                            <span class="status-dot-inline status-dot-red"></span>
+                            <span class="badge badge-error">Critical</span>
+                            {% elif d.fleet_percentile >= 95 %}
+                            <span class="status-dot-inline status-dot-yellow"></span>
+                            <span class="badge badge-warning">Warning</span>
+                            {% else %}
+                            <span class="status-dot-inline status-dot-green"></span>
+                            <span class="badge badge-success">Normal</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if d.fleet_percentile is not none %}
+                            {{ "%.1f"|format(d.fleet_percentile) }}%
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>{{ d.timestamp or '—' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No fleet data available</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

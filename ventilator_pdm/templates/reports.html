@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Reports — PdM Service{% endblock %}
+
+{% block page_title %}Reports{% endblock %}
+
+{% block content %}
+<!-- Summary Cards -->
+<div class="cards-grid">
+    <div class="card">
+        <div class="card-header">Total Alerts</div>
+        <div class="card-body">
+            <div class="info-row">
+                <span class="info-label">All Levels</span>
+                <span class="info-value">{{ total_alerts }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Warning + Critical</div>
+        <div class="card-body">
+            <div class="info-row">
+                <span class="info-label">Elevated Alerts</span>
+                <span class="info-value">{{ warning_plus }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Feedback Labels</div>
+        <div class="card-body">
+            <div class="info-row">
+                <span class="info-label">Total Labels</span>
+                <span class="info-value">{{ total_labels }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Confirmed Faults</div>
+        <div class="card-body">
+            <div class="info-row">
+                <span class="info-label">Confirmed</span>
+                <span class="info-value">{{ confirmed_count }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Button -->
+<div class="card card-wide" style="margin-bottom: 24px;">
+    <div class="card-header">Data Export</div>
+    <div class="card-body">
+        <p style="margin-bottom: 12px;">
+            Export all pilot data (alerts, feedback labels, work orders, health log, model versions)
+            as a ZIP archive of CSV files.
+        </p>
+        <a href="/api/reports/export" class="btn">Export Pilot Data (ZIP)</a>
+    </div>
+</div>
+
+<!-- Model Versions -->
+<div class="card card-wide" style="margin-bottom: 24px;">
+    <div class="card-header">Model Versions</div>
+    <div class="card-body">
+        {% if models %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Version</th>
+                    <th>Trained At</th>
+                    <th>Labels</th>
+                    <th>Confirmed</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in models %}
+                <tr>
+                    <td>v{{ m.version_id }}</td>
+                    <td>{{ m.trained_at }}</td>
+                    <td>{{ m.label_count }}</td>
+                    <td>{{ m.confirmed_count }}</td>
+                    <td>
+                        {% if m.active %}
+                        <span class="badge badge-success">Active</span>
+                        {% else %}
+                        <span class="muted">Inactive</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No model versions recorded</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- System Health Log -->
+<div class="card card-wide">
+    <div class="card-header">Recent System Health</div>
+    <div class="card-body">
+        {% if health_log %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Job</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                    <th>Rows</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in health_log %}
+                <tr>
+                    <td>{{ h.timestamp }}</td>
+                    <td>{{ h.job_name }}</td>
+                    <td>
+                        <span class="badge badge-{{ 'success' if h.status == 'success' else 'error' }}">
+                            {{ h.status }}
+                        </span>
+                    </td>
+                    <td>{{ h.duration_ms }} ms</td>
+                    <td>{{ h.rows_processed }}</td>
+                    <td>{{ h.error_message or '—' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No health log entries</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

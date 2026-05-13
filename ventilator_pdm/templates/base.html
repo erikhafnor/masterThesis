@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PdM Service{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="layout">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">PdM</h1>
+                <span class="logo-subtitle">Predictive Maintenance</span>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="/" class="nav-link {% if active_page == 'health' %}active{% endif %}">
+                        <span class="nav-icon">&#9679;</span>
+                        Health
+                    </a>
+                </li>
+                <li>
+                    <a href="/fleet" class="nav-link {% if active_page == 'fleet' %}active{% endif %}">
+                        <span class="nav-icon">&#9632;</span>
+                        Fleet
+                    </a>
+                </li>
+                <li>
+                    <a href="/alerts" class="nav-link {% if active_page == 'alerts' %}active{% endif %}">
+                        <span class="nav-icon">&#9650;</span>
+                        Alerts
+                    </a>
+                </li>
+                <li>
+                    <a href="/import" class="nav-link {% if active_page == 'import' %}active{% endif %}">
+                        <span class="nav-icon">&#8635;</span>
+                        Import
+                    </a>
+                </li>
+                <li>
+                    <a href="/learning" class="nav-link {% if active_page == 'learning' %}active{% endif %}">
+                        <span class="nav-icon">&#9733;</span>
+                        Learning
+                    </a>
+                </li>
+                <li>
+                    <a href="/reports" class="nav-link {% if active_page == 'reports' %}active{% endif %}">
+                        <span class="nav-icon">&#9776;</span>
+                        Reports
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="status-indicator status-{{ status|default('green') }}">
+                    <span class="status-dot"></span>
+                    <span class="status-label">
+                        {% if status == 'green' %}Pipeline OK
+                        {% elif status == 'yellow' %}Attention Needed
+                        {% elif status == 'red' %}Pipeline Error
+                        {% else %}Pipeline OK{% endif %}
+                    </span>
+                </div>
+                <div class="top-bar-title">{% block page_title %}Dashboard{% endblock %}</div>
+            </div>
+
+            <div class="content-area">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

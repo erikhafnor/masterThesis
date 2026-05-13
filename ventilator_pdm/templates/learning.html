@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Active Learning — PdM Service{% endblock %}
+
+{% block page_title %}Active Learning{% endblock %}
+
+{% block content %}
+<div class="cards-grid">
+    <!-- Label Progress Card -->
+    <div class="card">
+        <div class="card-header">Label Progress</div>
+        <div class="card-body">
+            <div class="info-row">
+                <span class="info-label">Total Labels</span>
+                <span class="info-value">{{ total_labels }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Target</span>
+                <span class="info-value">10</span>
+            </div>
+            <div style="margin-top: 12px;">
+                <div style="background: #e5e5ea; border-radius: 4px; height: 24px; overflow: hidden;">
+                    <div style="background: {% if total_labels >= 10 %}#34c759{% else %}#007aff{% endif %};
+                                height: 100%; width: {{ [total_labels * 10, 100]|min }}%;
+                                border-radius: 4px; transition: width 0.3s;">
+                    </div>
+                </div>
+                <p class="muted" style="margin-top: 4px;">
+                    {{ total_labels }}/10 labels collected
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmed Faults Card -->
+    <div class="card">
+        <div class="card-header">Confirmed Faults</div>
+        <div class="card-body">
+            <div class="info-row">
+                <span class="info-label">Confirmed</span>
+                <span class="info-value">{{ confirmed_count }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Required</span>
+                <span class="info-value">1</span>
+            </div>
+            <p class="muted" style="margin-top: 8px;">
+                {% if confirmed_count >= 1 %}
+                Confirmed fault requirement met.
+                {% else %}
+                At least 1 confirmed fault needed for retraining.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Retrain Status Card -->
+    <div class="card">
+        <div class="card-header">Retrain Status</div>
+        <div class="card-body">
+            <div class="status-display">
+                {% if retrain_ready %}
+                <span class="status-circle status-circle-green"></span>
+                <span class="status-text">Ready to Retrain</span>
+                {% else %}
+                <span class="status-circle status-circle-yellow"></span>
+                <span class="status-text">Not Ready</span>
+                {% endif %}
+            </div>
+            <p class="muted" style="margin-top: 8px;">
+                Requires 10+ labels and 1+ confirmed fault.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Labels Table -->
+<div class="card card-wide" style="margin-bottom: 24px;">
+    <div class="card-header">Feedback Labels</div>
+    <div class="card-body">
+        {% if labels %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Device</th>
+                    <th>Event Type</th>
+                    <th>Work Order</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for l in labels %}
+                <tr>
+                    <td>{{ l.date }}</td>
+                    <td>{{ l.device_serial }}</td>
+                    <td>
+                        {% if l.event_type == 'confirmed_fault' %}
+                        <span class="badge badge-error">{{ l.event_type }}</span>
+                        {% elif l.event_type == 'scheduled_pv' %}
+                        <span class="badge badge-warning">{{ l.event_type }}</span>
+                        {% else %}
+                        <span class="badge badge-success">{{ l.event_type }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ l.work_order_id or '—' }}</td>
+                    <td>{{ l.source }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No feedback labels collected yet</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Model Version History -->
+<div class="card card-wide">
+    <div class="card-header">Model Version History</div>
+    <div class="card-body">
+        {% if models %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Version</th>
+                    <th>Trained At</th>
+                    <th>Labels</th>
+                    <th>Confirmed</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in models %}
+                <tr>
+                    <td>v{{ m.version_id }}</td>
+                    <td>{{ m.trained_at }}</td>
+                    <td>{{ m.label_count }}</td>
+                    <td>{{ m.confirmed_count }}</td>
+                    <td>
+                        {% if m.active %}
+                        <span class="badge badge-success">Active</span>
+                        {% else %}
+                        <span class="muted">Inactive</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No model versions recorded</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

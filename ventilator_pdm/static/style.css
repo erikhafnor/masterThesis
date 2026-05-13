@@ -1,0 +1,381 @@
+/* PdM Service — Apple HIG-inspired styling */
+
+/* ===== Reset & Base ===== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", Roboto, sans-serif;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    line-height: 1.5;
+}
+
+/* ===== Layout ===== */
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+    width: 220px;
+    background: #ffffff;
+    border-right: 1px solid #e5e5e7;
+    padding: 24px 0;
+    flex-shrink: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    padding: 0 24px 24px;
+    border-bottom: 1px solid #e5e5e7;
+    margin-bottom: 16px;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1d1d1f;
+    letter-spacing: -0.02em;
+}
+
+.logo-subtitle {
+    display: block;
+    font-size: 0.75rem;
+    color: #86868b;
+    margin-top: 2px;
+}
+
+.nav-links {
+    list-style: none;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 24px;
+    color: #1d1d1f;
+    text-decoration: none;
+    font-size: 0.9375rem;
+    font-weight: 400;
+    transition: background 0.15s ease;
+    border-left: 3px solid transparent;
+}
+
+.nav-link:hover {
+    background: #f5f5f7;
+}
+
+.nav-link.active {
+    background: #f5f5f7;
+    font-weight: 600;
+    border-left-color: #1d1d1f;
+}
+
+.nav-icon {
+    font-size: 0.75rem;
+    color: #86868b;
+    width: 16px;
+    text-align: center;
+}
+
+.nav-link.active .nav-icon {
+    color: #1d1d1f;
+}
+
+/* ===== Main Content ===== */
+.main-content {
+    flex: 1;
+    margin-left: 220px;
+    min-height: 100vh;
+}
+
+/* ===== Top Bar ===== */
+.top-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 32px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e5e7;
+}
+
+.top-bar-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1d1d1f;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.status-indicator.status-green {
+    background: rgba(52, 199, 89, 0.1);
+    color: #248a3d;
+}
+
+.status-indicator.status-yellow {
+    background: rgba(255, 159, 10, 0.1);
+    color: #b25000;
+}
+
+.status-indicator.status-red {
+    background: rgba(255, 59, 48, 0.1);
+    color: #d70015;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-green .status-dot {
+    background: #34c759;
+}
+
+.status-yellow .status-dot {
+    background: #ff9f0a;
+}
+
+.status-red .status-dot {
+    background: #ff3b30;
+}
+
+.status-label {
+    line-height: 1;
+}
+
+/* ===== Content Area ===== */
+.content-area {
+    padding: 32px;
+    max-width: 1200px;
+}
+
+/* ===== Cards ===== */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.card-wide {
+    grid-column: 1 / -1;
+}
+
+.card-header {
+    padding: 16px 24px 12px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #86868b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.card-body {
+    padding: 0 24px 24px;
+}
+
+/* ===== Status Display ===== */
+.status-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.status-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-circle-green {
+    background: #34c759;
+    box-shadow: 0 0 8px rgba(52, 199, 89, 0.4);
+}
+
+.status-circle-yellow {
+    background: #ff9f0a;
+    box-shadow: 0 0 8px rgba(255, 159, 10, 0.4);
+}
+
+.status-circle-red {
+    background: #ff3b30;
+    box-shadow: 0 0 8px rgba(255, 59, 48, 0.4);
+}
+
+.status-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* ===== Info Rows ===== */
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f5f5f7;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-size: 0.875rem;
+    color: #86868b;
+}
+
+.info-value {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #1d1d1f;
+}
+
+/* ===== Badges ===== */
+.badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.badge-success {
+    background: rgba(52, 199, 89, 0.12);
+    color: #248a3d;
+}
+
+.badge-error {
+    background: rgba(255, 59, 48, 0.12);
+    color: #d70015;
+}
+
+.badge-warning {
+    background: rgba(255, 159, 10, 0.12);
+    color: #b25000;
+}
+
+/* ===== Tables ===== */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.data-table thead th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #86868b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #e5e5e7;
+}
+
+.data-table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f5f5f7;
+    color: #1d1d1f;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.error-message {
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #d70015;
+    font-size: 0.8125rem;
+}
+
+/* ===== Muted Text ===== */
+.muted {
+    color: #86868b;
+    font-size: 0.875rem;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+        padding: 16px 0;
+    }
+
+    .sidebar-header {
+        padding: 0 8px 16px;
+        text-align: center;
+    }
+
+    .logo-subtitle {
+        display: none;
+    }
+
+    .nav-link {
+        padding: 10px;
+        justify-content: center;
+    }
+
+    .nav-link span:not(.nav-icon) {
+        display: none;
+    }
+
+    .nav-icon {
+        font-size: 1rem;
+    }
+
+    .main-content {
+        margin-left: 60px;
+    }
+
+    .content-area {
+        padding: 16px;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Medusa Import — PdM Service{% endblock %}
+
+{% block page_title %}Medusa Import{% endblock %}
+
+{% block content %}
+<!-- Upload Form -->
+<div class="card card-wide" style="margin-bottom: 24px;">
+    <div class="card-header">Upload Medusa Excel Export</div>
+    <div class="card-body">
+        <form id="upload-form" enctype="multipart/form-data">
+            <div style="margin-bottom: 16px;">
+                <label for="file-input" style="display: block; margin-bottom: 8px;">
+                    Select Excel file (.xlsx) from Medusa CMMS export:
+                </label>
+                <input type="file" id="file-input" name="file" accept=".xlsx,.xls"
+                       style="margin-bottom: 12px;">
+            </div>
+            <button type="submit" class="btn" id="upload-btn">Upload & Preview</button>
+        </form>
+
+        <!-- Preview area -->
+        <div id="preview-area" style="display: none; margin-top: 24px;">
+            <h3 style="margin-bottom: 12px;">Preview</h3>
+            <div id="preview-content"></div>
+            <button class="btn" id="confirm-btn" style="margin-top: 16px;"
+                    onclick="confirmImport()">Confirm Import</button>
+        </div>
+
+        <div id="upload-status" style="margin-top: 16px;"></div>
+    </div>
+</div>
+
+<!-- Import History -->
+<div class="card card-wide">
+    <div class="card-header">Import History</div>
+    <div class="card-body">
+        {% if work_orders %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Work Order</th>
+                    <th>Type</th>
+                    <th>Device Reg.</th>
+                    <th>Registered</th>
+                    <th>Completed</th>
+                    <th>Fault Description</th>
+                    <th>Matched</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wo in work_orders %}
+                <tr>
+                    <td>{{ wo.work_order_id }}</td>
+                    <td>{{ wo.work_order_type or '—' }}</td>
+                    <td>{{ wo.device_reg }}</td>
+                    <td>{{ wo.registered_date or '—' }}</td>
+                    <td>{{ wo.completed_date or '—' }}</td>
+                    <td>{{ wo.fault_description or '—' }}</td>
+                    <td>
+                        {% if wo.matched %}
+                        <span class="badge badge-success">Yes</span>
+                        {% else %}
+                        <span class="badge badge-warning">No</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No work orders imported yet</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('upload-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const fileInput = document.getElementById('file-input');
+    if (!fileInput.files.length) {
+        document.getElementById('upload-status').innerHTML =
+            '<p class="muted">Please select a file first.</p>';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    document.getElementById('upload-btn').disabled = true;
+    document.getElementById('upload-status').innerHTML =
+        '<p class="muted">Uploading and parsing...</p>';
+
+    try {
+        const resp = await fetch('/import/upload', { method: 'POST', body: formData });
+        const data = await resp.json();
+
+        if (data.error) {
+            document.getElementById('upload-status').innerHTML =
+                '<p class="muted">' + data.error + '</p>';
+            return;
+        }
+
+        // Show preview table
+        let html = '<p>' + data.records.length + ' work orders found.</p>';
+        html += '<table class="data-table"><thead><tr>' +
+            '<th>Work Order</th><th>Type</th><th>Device Reg.</th>' +
+            '<th>Fault Description</th></tr></thead><tbody>';
+        data.records.forEach(r => {
+            html += '<tr><td>' + r.work_order_id + '</td>' +
+                '<td>' + (r.work_order_type || '—') + '</td>' +
+                '<td>' + r.device_reg + '</td>' +
+                '<td>' + (r.fault_description || '—') + '</td></tr>';
+        });
+        html += '</tbody></table>';
+
+        document.getElementById('preview-content').innerHTML = html;
+        document.getElementById('preview-area').style.display = 'block';
+        document.getElementById('upload-status').innerHTML = '';
+
+        // Store filename for confirm step
+        window._importFilename = data.filename;
+    } catch (err) {
+        document.getElementById('upload-status').innerHTML =
+            '<p class="muted">Upload failed: ' + err.message + '</p>';
+    } finally {
+        document.getElementById('upload-btn').disabled = false;
+    }
+});
+
+async function confirmImport() {
+    document.getElementById('confirm-btn').disabled = true;
+    document.getElementById('upload-status').innerHTML =
+        '<p class="muted">Importing and matching labels...</p>';
+
+    try {
+        const resp = await fetch('/import/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: window._importFilename })
+        });
+        const data = await resp.json();
+
+        let html = '<p>Import complete: ' + data.imported + ' work orders imported, ' +
+            data.matches.length + ' label matches.</p>';
+        document.getElementById('upload-status').innerHTML = html;
+        document.getElementById('preview-area').style.display = 'none';
+
+        // Reload page to update import history
+        setTimeout(() => window.location.reload(), 1500);
+    } catch (err) {
+        document.getElementById('upload-status').innerHTML =
+            '<p class="muted">Import failed: ' + err.message + '</p>';
+    } finally {
+        document.getElementById('confirm-btn').disabled = false;
+    }
+}
+</script>
+{% endblock %}

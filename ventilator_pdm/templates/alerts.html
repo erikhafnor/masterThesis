@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Alert History — PdM Service{% endblock %}
+
+{% block page_title %}Alert History{% endblock %}
+
+{% block content %}
+<div class="card card-wide">
+    <div class="card-header">Alert History</div>
+    <div class="card-body">
+        {% if alerts %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Device (Reg.nr.)</th>
+                    <th>Level</th>
+                    <th>Score</th>
+                    <th>Fleet %</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in alerts %}
+                <tr>
+                    <td>{{ a.timestamp }}</td>
+                    <td>
+                        <a href="/device/{{ a.device_serial }}" class="device-link">
+                            {{ a.device_serial }}
+                        </a>
+                    </td>
+                    <td>
+                        {% if a.alert_level == 'critical' %}
+                        <span class="badge badge-error">{{ a.alert_level }}</span>
+                        {% elif a.alert_level == 'warning' %}
+                        <span class="badge badge-warning">{{ a.alert_level }}</span>
+                        {% else %}
+                        <span class="badge badge-success">{{ a.alert_level }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ "%.4f"|format(a.anomaly_score) if a.anomaly_score is not none else '—' }}</td>
+                    <td>{{ "%.1f"|format(a.fleet_percentile) if a.fleet_percentile is not none else '—' }}%</td>
+                    <td>
+                        <a href="/device/{{ a.device_serial }}" class="btn btn-small">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No alerts yet</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

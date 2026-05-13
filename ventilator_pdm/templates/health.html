@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}System Health — PdM Service{% endblock %}
+
+{% block page_title %}System Health{% endblock %}
+
+{% block content %}
+<div class="cards-grid">
+    <!-- Pipeline Status Card -->
+    <div class="card">
+        <div class="card-header">Pipeline Status</div>
+        <div class="card-body">
+            <div class="status-display">
+                <span class="status-circle status-circle-{{ status }}"></span>
+                <span class="status-text">
+                    {% if status == 'green' %}Operational
+                    {% elif status == 'yellow' %}Degraded
+                    {% elif status == 'red' %}Error
+                    {% endif %}
+                </span>
+            </div>
+            {% if not last_inference %}
+            <p class="muted">No inference runs yet</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Last Inference Run Card -->
+    <div class="card">
+        <div class="card-header">Last Inference Run</div>
+        <div class="card-body">
+            {% if last_inference %}
+            <div class="info-row">
+                <span class="info-label">Timestamp</span>
+                <span class="info-value">{{ last_inference.timestamp }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Duration</span>
+                <span class="info-value">{{ last_inference.duration_ms }} ms</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Rows Processed</span>
+                <span class="info-value">{{ last_inference.rows_processed }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Status</span>
+                <span class="info-value badge badge-{{ 'success' if last_inference.status == 'success' else 'error' }}">
+                    {{ last_inference.status }}
+                </span>
+            </div>
+            {% else %}
+            <p class="muted">No inference runs yet</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Data Freshness Card -->
+    <div class="card">
+        <div class="card-header">Data Freshness</div>
+        <div class="card-body">
+            {% if last_health %}
+            <div class="info-row">
+                <span class="info-label">Last Health Check</span>
+                <span class="info-value">{{ last_health.timestamp }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">QuestDB Status</span>
+                <span class="info-value badge badge-{{ 'success' if last_health.status == 'success' else 'error' }}">
+                    {{ last_health.status }}
+                </span>
+            </div>
+            {% else %}
+            <p class="muted">No health checks yet</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Model Info Card -->
+    <div class="card">
+        <div class="card-header">Active Model</div>
+        <div class="card-body">
+            {% if active_model %}
+            <div class="info-row">
+                <span class="info-label">Version</span>
+                <span class="info-value">v{{ active_model.version_id }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Trained</span>
+                <span class="info-value">{{ active_model.trained_at }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Labels</span>
+                <span class="info-value">{{ active_model.label_count }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Feedback Labels</span>
+                <span class="info-value">{{ label_count }}</span>
+            </div>
+            {% else %}
+            <p class="muted">No model registered</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Error Log Table -->
+<div class="card card-wide">
+    <div class="card-header">Recent Errors</div>
+    <div class="card-body">
+        {% if recent_errors %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Job</th>
+                    <th>Duration</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for err in recent_errors %}
+                <tr>
+                    <td>{{ err.timestamp }}</td>
+                    <td>{{ err.job_name }}</td>
+                    <td>{{ err.duration_ms }} ms</td>
+                    <td class="error-message">{{ err.error_message or '—' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No errors recorded</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
